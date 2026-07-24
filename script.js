@@ -100,25 +100,72 @@ const CONFIG = {
     return chapters.find((chapter) => chapter.id === id);
   }
 
-  function renderHome() {
+ function renderHome() {
     const total = progress.correct + progress.incorrect;
-    el.overallAccuracy.textContent = total ? `${Math.round((progress.correct / total) * 100)}%` : "0%";
-    el.studiedCount.textContent = `${progress.studiedIds.length}問`;
-    el.weakCount.textContent = `${progress.weakIds.length}問`;
-    el.chapterList.innerHTML = chapters.map((chapter) => {
-      const chapterProgress = progress.chapters[chapter.id] || {};
-      const done = Object.keys(chapterProgress).length;
-      const percent = chapter.questions.length ? Math.round((done / chapter.questions.length) * 100) : 0;
-      return `
-        <article class="chapter-card">
-          <span class="pill">Chapter ${String(chapter.id).padStart(2, "0")}</span>
-          <h2>${escapeHtml(chapter.title)}</h2>
-          <div class="chapter-progress" aria-label="${percent}%"><span style="width:${percent}%"></span></div>
-          <p class="summary-label">${done}/${chapter.questions.length}問 学習済み</p>
-          <button class="primary-button" type="button" data-chapter="${chapter.id}">学習する</button>
-        </article>
-      `;
+
+    el.overallAccuracy.textContent =
+        total ? `${Math.round(progress.correct / total * 100)}%` : "0%";
+
+    el.studiedCount.textContent =
+        `${progress.studiedIds.length}問`;
+
+    el.weakCount.textContent =
+        `${progress.weakIds.length}問`;
+
+    el.chapterList.innerHTML = chapters.map(chapter => {
+
+        const chapterProgress =
+            progress.chapters[chapter.id] || {};
+
+        const done =
+            Object.keys(chapterProgress).length;
+
+        const totalQuestions =
+            chapter.questions.length;
+
+        const percent =
+            totalQuestions
+                ? Math.round(done / totalQuestions * 100)
+                : 0;
+
+        return `
+<article class="chapter-card">
+
+    <div class="chapter-header">
+
+        <span class="chapter-tag">
+            Chapter ${String(chapter.id).padStart(2,"0")}
+        </span>
+
+        <button
+            class="study-btn"
+            data-chapter="${chapter.id}">
+            学習
+        </button>
+
+    </div>
+
+    <h2 class="chapter-title">
+        ${escapeHtml(chapter.title)}
+    </h2>
+
+    <div class="chapter-footer">
+
+        <span class="chapter-count">
+            ${done}/${totalQuestions}問
+        </span>
+
+        <div class="chapter-progress">
+            <span style="width:${percent}%"></span>
+        </div>
+
+    </div>
+
+</article>
+`;
+
     }).join("");
+
   }
 
   function openHome() {
@@ -154,7 +201,7 @@ const CONFIG = {
       chapter: question.chapter || chapter.id
     }))).filter((question) => wanted.has(`${question.chapter}:${question.id}`));
     if (!questions.length) {
-      alert(kind === "weak" ? "苦手問題はまだ登録されていません。" : "間違えた問題はまだありません。");
+      alert(kind === "weak" ? "苦手問題は登録されていません。" : "間違えた問題はありません。");
       return;
     }
     state.chapterId = "review";

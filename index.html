@@ -14,29 +14,32 @@
       <p class="eyebrow">EIKEN Grade 3</p>
       <h1>英検3級 合格問題集</h1>
     </div>
-    <button id="resetBtn" class="icon-button" type="button" aria-label="すべてのデータをリセット">↺</button>
+     <button id="resetBtn" class="header-reset" type="button" aria-label="すべてのデータをリセット">↺</button>
   </header>
 
   <main>
     <section id="homeView" class="view active">
       <div class="summary">
         <div>
-          <span class="summary-label">総合正答率</span>
+          <span class="summary-label">正答率</span>
           <strong id="overallAccuracy">0%</strong>
         </div>
         <div>
-          <span class="summary-label">学習済み</span>
+          <span class="summary-label">学習済</span>
           <strong id="studiedCount">0問</strong>
         </div>
         <div>
           <span class="summary-label">苦手</span>
           <strong id="weakCount">0問</strong>
-        </div>
       </div>
+
+      </div>
+
       <div class="toolbar">
-        <button id="reviewWrongBtn" class="secondary-button" type="button">間違えた問題だけ復習</button>
-        <button id="reviewWeakBtn" class="secondary-button" type="button">苦手問題を復習</button>
+        <button id="reviewWrongBtn" class="secondary-button" type="button">間違えた問題</button>
+        <button id="reviewWeakBtn" class="secondary-button" type="button">苦手な問題</button>
       </div>
+      
       <div id="chapterList" class="chapter-grid"></div>
     </section>
 
