@@ -1,10 +1,27 @@
 {
   "name": "英検3級 合格問題集アプリ",
   "short_name": "英検3級",
-  "start_url": "./index.html",
+  "start_url": "/eiken3-app/",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#0f2a4a",
   "description": "スマホとPCで使える英検3級学習アプリ",
-  "icons": []
+
+  "icons": [
+    {
+      "src": "icon/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "icon/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    },
+    {
+      "src": "icon/icon-1024.png",
+      "sizes": "1024x1024",
+      "type": "image/png"
+    }
+  ]
 }
