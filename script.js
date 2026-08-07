@@ -60,7 +60,8 @@ const CONFIG = {
     recordPlayback: document.getElementById("recordPlayback"),
     progressBar: document.getElementById("progressBar"),
     positionText: document.getElementById("positionText"),
-    checkBtn: document.getElementById("checkBtn")
+    checkBtn: document.getElementById("checkBtn"),
+    chapter07AudioBtn: document.getElementById("chapter07AudioBtn")
   };
 
   let progress = loadProgress();
@@ -218,13 +219,18 @@ const CONFIG = {
 
   function renderQuestion() {
     const question = currentQuestion();
+    if (Number(question.chapter) === 7) {
+    renderChapter07(question);
+    return;
+    }
     const chapter = byId(question.chapter);
+    el.chapter07AudioBtn.classList.add("hidden");
     state.selectedChoice = null;
     state.sortAnswer = [];
     state.scriptVisible = false;
     el.chapterTitle.textContent = chapter ? `Chapter ${String(chapter.id).padStart(2, "0")} ${chapter.title}` : "復習";
     const type = question.type || "choice";
-    el.questionTitle.textContent = question.title || question.section || `問題 ${question.id}`;
+    el.questionTitle.textContent = "";
     el.questionMeta.innerHTML = [
       `ID ${question.id}`,
       question.cd ? `CD ${question.cd}` : "",
@@ -253,9 +259,15 @@ const CONFIG = {
 
       el.imageArea.appendChild(image);
     }
+    if (Number(question.chapter) === 7) {
+    el.passageArea.classList.add("hidden");
+    el.questionText.classList.add("hidden");
+} else {
     el.passageArea.classList.toggle("hidden", !passage);
     el.passageArea.textContent = passage;
+    el.questionText.classList.remove("hidden");
     el.questionText.textContent = question.prompt || question.question || "";
+}
     el.hintArea.classList.add("hidden");
     el.hintArea.textContent = question.hint || "";
     el.answerPanel.classList.add("hidden");
@@ -312,6 +324,13 @@ const CONFIG = {
   }
 
   function renderAudio(question) {
+   if (Number(question.chapter) === 7) {
+    el.audioPanel.classList.remove("hidden");
+    el.audioTrackButtons.classList.add("hidden");
+    document.getElementById("replayBtn").classList.add("hidden");
+    return;
+   }
+
     if ([1, 2, 3, 4].includes(Number(question.chapter))) {
       stopAudio();
       el.audioPanel.classList.add("hidden");
@@ -605,15 +624,37 @@ const CONFIG = {
   });
   document.getElementById("checkBtn").addEventListener("click", checkAnswer);
   document.getElementById("weakBtn").addEventListener("click", () => {
-    const key = questionKey(currentQuestion());
+
+    const question = currentQuestion();
+    const key = questionKey(question);
+
     if (progress.weakIds.includes(key)) {
-      progress.weakIds = progress.weakIds.filter((id) => id !== key);
+        progress.weakIds = progress.weakIds.filter((id) => id !== key);
     } else {
-      progress.weakIds.push(key);
+        progress.weakIds.push(key);
     }
+
     saveProgress();
-    updateWeakButton(currentQuestion());
-  });
+    updateWeakButton(question);
+
+    if (Number(question.chapter) === 7) {
+
+        el.answerPanel.classList.remove("hidden");
+
+        el.resultTitle.textContent = "";
+
+        el.answerText.innerHTML = `
+        `;
+
+        el.explanationText.innerHTML = "";
+        el.grammarText.innerHTML = "";
+        el.vocabText.innerHTML = "";
+        el.modelAnswerText.innerHTML = "";
+    }
+
+});
+
+
   document.getElementById("prevBtn").addEventListener("click", () => {
     if (state.index > 0) {
       state.index--;
@@ -632,10 +673,46 @@ const CONFIG = {
     const selectedSpeed = speeds.includes(Number(el.speedSelect.value)) ? Number(el.speedSelect.value) : 1;
     el.audioPlayer.playbackRate = selectedSpeed;
   });
-  document.getElementById("replayBtn").addEventListener("click", () => {
+
+
+ const replayBtn = document.getElementById("replayBtn");
+    if (replayBtn) {
+    replayBtn.addEventListener("click", () => {
+
+
     el.audioPlayer.currentTime = 0;
     el.audioPlayer.play().catch(() => {});
-  });
+  
+   });
+ }
+
+document.getElementById("chapter07AudioBtn").addEventListener("click", () => {
+
+    const question = currentQuestion();
+
+    if (!question || !question.example) return;
+
+    window.speechSynthesis.cancel();
+
+    const utterance = new SpeechSynthesisUtterance(question.example);
+
+    utterance.lang = "en-US";
+    utterance.rate = 0.9;
+    utterance.pitch = 1;
+
+    const voices = window.speechSynthesis.getVoices();
+
+    const englishVoice = voices.find((voice) =>
+        voice.lang && voice.lang.toLowerCase().startsWith("en")
+    );
+
+    if (englishVoice) {
+        utterance.voice = englishVoice;
+    }
+
+    window.speechSynthesis.speak(utterance);
+
+});
 
   el.audioTrackButtons.addEventListener("click", (event) => {
     const button = event.target.closest("[data-audio-track]");
@@ -673,7 +750,65 @@ const CONFIG = {
     window.addEventListener("load", () => {
       navigator.serviceWorker.register("./service-worker.js").catch(() => {});
     });
-  }
+    }
+
+   function renderChapter07(question) {
+
+    const chapter = byId(question.chapter);
+
+    el.chapterTitle.textContent =
+        `Chapter ${String(chapter.id).padStart(2, "0")} ${chapter.title}`;
+
+    el.questionTitle.textContent = "";
+
+        // Chapter07では通常問題画面を非表示
+    el.questionMeta.innerHTML = "";
+
+    el.passageArea.classList.add("hidden");
+    el.questionText.classList.add("hidden");
+    el.hintArea.classList.add("hidden");
+    el.sortArea.classList.add("hidden");
+    el.choicesArea.innerHTML = "";
+
+    el.dictationInput.classList.add("hidden");
+    el.answerPanel.classList.add("hidden");
+    el.shadowingPanel.classList.add("hidden");
+    el.recordingPanel.classList.add("hidden");
+
+    el.audioPanel.classList.add("hidden");
+    
+    el.positionText.textContent =
+        `${state.index + 1} / ${state.questions.length}`;
+
+    el.progressBar.style.width =
+        `${Math.round(((state.index + 1) / state.questions.length) * 100)}%`;
+
+    // イラスト表示
+    el.imageArea.classList.remove("hidden");
+    el.imageArea.innerHTML = "";
+
+    if (question.image) {
+
+        const image = new Image();
+
+        image.alt = question.title || "";
+
+        if (question.image.startsWith("http")) {
+            image.src = question.image;
+        } else if (question.image.startsWith("images/")) {
+            image.src = question.image;
+        } else {
+            image.src = CONFIG.IMAGE_BASE + question.image;
+        }
+
+        el.imageArea.appendChild(image);
+    }
+
+  el.chapter07AudioBtn.classList.remove("hidden");
+  el.chapter07AudioBtn.textContent = "▶ 音声";
+
+ }
+
 
   renderHome();
 })();

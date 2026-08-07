@@ -2,12 +2,12 @@ window.EIKEN3_DATA = window.EIKEN3_DATA || [];
 
 const chapter07Rows = `
 accident	事故	There was an accident near the station.	駅の近くで事故がありました。
-actor	俳優	My brother wants to be an actor.	私の弟は俳優になりたがっています。
+actor	俳優	My brother wants to be an actor.	私の弟は俳優になりたい。
 adult	大人、成人	This ticket is for adults.	このチケットは大人用です。
 area	地域、場所	We do not have much information about the area.	私たちはその地域についてあまり情報を持っていません。
-both	両方	I know both of her parents.	私は彼女の両親の両方を知っています。
+both	両方	I know both of her parents.	私は彼女の親、両方とも知っています。
 bottom	底、一番下	Write your name at the bottom of the page.	ページの一番下に名前を書きなさい。
-circle	円	Draw a circle around the correct answer.	正しい答えのまわりに円を描きなさい。
+circle	円	Draw a circle around the correct answer.	正しい答えに、丸を描きなさい。
 click	クリックする	Click this button to start.	始めるにはこのボタンをクリックしなさい。
 clothes	服	I bought some new clothes yesterday.	私は昨日新しい服を買いました。
 cloud	雲	There are many clouds in the sky.	空にはたくさんの雲があります。
@@ -21,7 +21,7 @@ environment	環境	We should protect the environment.	私たちは環境を守�
 event	出来事、行事	The school event was very exciting.	学校行事はとてもわくわくするものでした。
 exam	試験	I am worried about the exam.	私は試験のことを心配しています。
 exercise	運動	Exercise is good for your health.	運動は健康によいです。
-fact	事実	In fact, I did not know the answer.	実際、私はその答えを知りませんでした。
+fact	事実	In fact, I did not know the answer.	実際、私はその答えを知らなかった。
 factory	工場	My uncle works at a factory.	私のおじは工場で働いています。
 farewell	別れ	We had a farewell party for our teacher.	私たちは先生のために送別会をしました。
 farm	農場	They work on a farm every summer.	彼らは毎年夏に農場で働きます。
@@ -75,7 +75,7 @@ scissors	はさみ	May I use your scissors?	あなたのはさみを使っても
 score	得点	What was the score of the game?	その試合の得点は何でしたか。
 secret	秘密	This is a secret between us.	これは私たちの間の秘密です。
 section	部分	Read the next section carefully.	次の部分を注意深く読みなさい。
-sentence	文	Write one sentence in English.	英語で1文を書きなさい。
+sentence	文	Write one sentence in English.	英語で一文を書きなさい。
 shopper	買い物客	The store was full of shoppers.	その店は買い物客でいっぱいでした。
 sightseeing	観光	We enjoyed sightseeing in Kyoto.	私たちは京都で観光を楽しみました。
 sign	合図、看板	Look at that sign.	あの看板を見なさい。
@@ -328,18 +328,44 @@ a pair of	1対の	I bought a pair of shoes.	私は靴を1足買いました。
 a piece of	1個の、1枚の	May I have a piece of cake?	ケーキを1切れいただけますか。
 a sheet of	1枚の	Please give me a sheet of paper.	紙を1枚ください。
 a slice of	1切れの	I ate a slice of bread.	私はパンを1切れ食べました。
+
 `.trim().split("\n").map((line, index) => {
   const [word, jp, example, exampleJp] = line.split("\t");
-  return { id: index + 1, word, jp, example, exampleJp };
+ 
+
+  return {
+  id: index + 1,
+
+  image: `images/chapter07/${String(index + 1)
+    .padStart(3, "0")}_${word
+    .replace(/ /g, "_")
+    .replace(/[^a-zA-Z0-9_-]/g, "")}.webp`,
+
+  word,
+
+  jp,
+
+  example,
+
+  exampleJp
+};
+ 
 });
 
 const chapter07Questions = chapter07Rows.map((item) => ({
   chapter: 7,
+  image: item.image,
   id: item.id,
   type: "vocab",
   typeLabel: "単語抽出",
   title: `例文 ${item.id}`,
   prompt: "",
+
+  word: item.word,
+  wordJp: item.jp,
+  example: item.example,
+  exampleJp: item.exampleJp,
+
   passage: `${item.example}\n${item.word}`,
   answer: `${item.exampleJp}\n${item.jp}`,
   translation: "",
