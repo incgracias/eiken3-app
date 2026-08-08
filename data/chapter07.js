@@ -336,7 +336,7 @@ a slice of	1切れの	I ate a slice of bread.	私はパンを1切れ食べまし
   return {
   id: index + 1,
 
-  image: `images/chapter07/${String(index + 1)
+  image: `chapter07/${String(index + 1)
     .padStart(3, "0")}_${word
     .replace(/ /g, "_")
     .replace(/[^a-zA-Z0-9_-]/g, "")}.webp`,
